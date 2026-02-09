@@ -97,7 +97,8 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
     
     // Use system font that supports Turkish characters
     const fontSize = Math.max(24, Math.min(48, width / 15));
-    ctx.font = `bold ${fontSize}px "DejaVu Sans", "Arial Unicode MS", Arial, sans-serif`;
+    canvas.toBuffer('image/jpeg', { quality: 0.95 });
+    ctx.font = `bold ${fontSize}px sans-serif`;
     
     // Text wrapping
     const maxWidth = width - 100;
