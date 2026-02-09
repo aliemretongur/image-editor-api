@@ -93,7 +93,7 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
 
     // FONT AYARLARINI ÖNCE YAP (toBuffer'dan önce!)
     const fontSize = Math.max(24, Math.min(48, width / 15));
-    ctx.font = `bold ${fontSize}px "Arial", "Helvetica", "DejaVu Sans", sans-serif`;
+    ctx.font = `bold ${fontSize}px "Noto Sans", "DejaVu Sans", "Arial Unicode MS", sans-serif`;
     ctx.fillStyle = '#000000';
     ctx.textBaseline = 'bottom';
     
