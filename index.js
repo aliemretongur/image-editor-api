@@ -1,8 +1,17 @@
 const express = require('express');
 const multer = require('multer');
-const { createCanvas, loadImage } = require('canvas');
+const { createCanvas, loadImage, registerFont } = require('canvas');
 const https = require('https');
 const http = require('http');
+const path = require('path');
+
+// FONT KAYDET
+try {
+  registerFont(path.join(__dirname, 'fonts', 'DejaVuSans.ttf'), { family: 'DejaVu Sans' });
+  console.log('Font loaded successfully');
+} catch (err) {
+  console.log('Font load warning:', err.message);
+}
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -91,20 +100,9 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
       }
     }
 
-    // FONT AYARLARI - Türkçe karakter desteği için
+    // FONT AYARLARI - Türkçe karakter desteği
     const fontSize = Math.max(24, Math.min(48, width / 15));
-    
-    // Birden fazla font deneyeceğiz
-    const fonts = [
-      `bold ${fontSize}px "Noto Sans"`,
-      `bold ${fontSize}px "DejaVu Sans"`,
-      `bold ${fontSize}px "Liberation Sans"`,
-      `bold ${fontSize}px "FreeSans"`,
-      `bold ${fontSize}px sans-serif`
-    ];
-    
-    // İlk çalışan fontu kullan
-    ctx.font = fonts[0];
+    ctx.font = `bold ${fontSize}px "DejaVu Sans", sans-serif`;
     ctx.fillStyle = '#000000';
     ctx.textBaseline = 'bottom';
     
