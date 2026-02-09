@@ -5,6 +5,11 @@ const https = require('https');
 const http = require('http');
 const path = require('path');
 
+const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
+
+const PORT = process.env.PORT || 3000;
+
 // FONT KAYDET
 try {
   registerFont(path.join(__dirname, 'fonts', 'DejaVuSans.ttf'), { family: 'DejaVu Sans' });
@@ -12,7 +17,6 @@ try {
 } catch (err) {
   console.log('Font load warning:', err.message);
 }
-
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
