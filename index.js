@@ -1,11 +1,28 @@
 const express = require('express');
 const multer = require('multer');
-const { createCanvas, loadImage, registerFont } = require('canvas');
+const { createCanvas, loadImage } = require('canvas');
+const https = require('https');
+const http = require('http');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 const PORT = process.env.PORT || 3000;
+
+// Helper function to load image from URL
+async function loadImageFromUrl(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        loadImage(buffer).then(resolve).catch(reject);
+      });
+    }).on('error', reject);
+  });
+}
 
 // Test endpoint
 app.get('/', (req, res) => {
@@ -20,6 +37,7 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
     }
 
     const text = req.body.text || 'Default Text';
+    const logoUrl = req.body.logo_url || null;
     
     // Load image
     const img = await loadImage(req.file.buffer);
@@ -43,16 +61,46 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, height - gradientHeight, width, gradientHeight);
 
+    // Add logo if provided
+    if (logoUrl) {
+      try {
+        const logo = await loadImageFromUrl(logoUrl);
+        const logoMaxHeight = 80;
+        const logoMaxWidth = 150;
+        
+        let logoWidth = logo.width;
+        let logoHeight = logo.height;
+        
+        // Resize logo to fit
+        if (logoHeight > logoMaxHeight) {
+          logoWidth = (logoMaxHeight / logoHeight) * logoWidth;
+          logoHeight = logoMaxHeight;
+        }
+        if (logoWidth > logoMaxWidth) {
+          logoHeight = (logoMaxWidth / logoWidth) * logoHeight;
+          logoWidth = logoMaxWidth;
+        }
+        
+        // Draw logo at bottom-right
+        const logoX = width - logoWidth - 30;
+        const logoY = height - logoHeight - 30;
+        ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+      } catch (logoError) {
+        console.error('Logo load error:', logoError);
+        // Continue without logo if it fails
+      }
+    }
+
     // Add text with better settings
     ctx.fillStyle = '#000000';
     ctx.textBaseline = 'bottom';
     
     // Use system font that supports Turkish characters
-    const fontSize = Math.max(24, Math.min(48, width / 15)); // Responsive font size
+    const fontSize = Math.max(24, Math.min(48, width / 15));
     ctx.font = `bold ${fontSize}px "DejaVu Sans", "Arial Unicode MS", Arial, sans-serif`;
     
     // Text wrapping
-    const maxWidth = width - 100; // 50px padding on each side
+    const maxWidth = width - 100;
     const words = text.split(' ');
     const lines = [];
     let currentLine = words[0];
