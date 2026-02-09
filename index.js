@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { createCanvas, loadImage, registerFont } = require('canvas');
+const { createCanvas, loadImage } = require('canvas');
 const https = require('https');
 const http = require('http');
 
@@ -91,9 +91,20 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
       }
     }
 
-    // FONT AYARLARINI ÖNCE YAP (toBuffer'dan önce!)
+    // FONT AYARLARI - Türkçe karakter desteği için
     const fontSize = Math.max(24, Math.min(48, width / 15));
-    ctx.font = `bold ${fontSize}px "Noto Sans", "DejaVu Sans", "Arial Unicode MS", sans-serif`;
+    
+    // Birden fazla font deneyeceğiz
+    const fonts = [
+      `bold ${fontSize}px "Noto Sans"`,
+      `bold ${fontSize}px "DejaVu Sans"`,
+      `bold ${fontSize}px "Liberation Sans"`,
+      `bold ${fontSize}px "FreeSans"`,
+      `bold ${fontSize}px sans-serif`
+    ];
+    
+    // İlk çalışan fontu kullan
+    ctx.font = fonts[0];
     ctx.fillStyle = '#000000';
     ctx.textBaseline = 'bottom';
     
@@ -124,7 +135,7 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
       ctx.fillText(line, 50, y);
     });
 
-    // Convert to buffer (EN SONDA YAP!)
+    // Convert to buffer (EN SONDA!)
     const buffer = canvas.toBuffer('image/jpeg', { quality: 0.95 });
 
     // Send image
