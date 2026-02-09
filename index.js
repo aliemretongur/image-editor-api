@@ -5,11 +5,6 @@ const https = require('https');
 const http = require('http');
 const path = require('path');
 
-const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
-
-const PORT = process.env.PORT || 3000;
-
 // FONT KAYDET
 try {
   registerFont(path.join(__dirname, 'fonts', 'DejaVuSans.ttf'), { family: 'DejaVu Sans' });
@@ -17,9 +12,9 @@ try {
 } catch (err) {
   console.log('Font load warning:', err.message);
 }
+
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
-
 const PORT = process.env.PORT || 3000;
 
 // Helper function to load image from URL
@@ -100,11 +95,10 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
         ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
       } catch (logoError) {
         console.error('Logo load error:', logoError);
-        // Continue without logo if it fails
       }
     }
 
-    // FONT AYARLARI - Türkçe karakter desteği
+    // FONT AYARLARI
     const fontSize = Math.max(24, Math.min(48, width / 15));
     ctx.font = `bold ${fontSize}px "DejaVu Sans", sans-serif`;
     ctx.fillStyle = '#000000';
@@ -137,7 +131,7 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
       ctx.fillText(line, 50, y);
     });
 
-    // Convert to buffer (EN SONDA!)
+    // Convert to buffer
     const buffer = canvas.toBuffer('image/jpeg', { quality: 0.95 });
 
     // Send image
