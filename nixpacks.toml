@@ -1,22 +1,8 @@
 [phases.setup]
-nixPkgs = ["nodejs", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman"]
+nixPkgs = ["nodejs", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman", "fontconfig", "freefont_ttf"]
 
 [phases.install]
 cmds = ["npm install"]
 
 [start]
 cmd = "npm start"
-```
-
-Bu dosya Railway'e şunları söyler:
-- Canvas için gerekli sistem kütüphanelerini yükle (cairo, pango, vb.)
-- npm install ile bağımlılıkları kur
-- npm start ile uygulamayı başlat
-
-**Dosya yapınız şöyle olmalı:**
-```
-image-editor-api/
-├── .gitignore
-├── index.js
-├── package.json
-└── nixpacks.toml (YENİ)
