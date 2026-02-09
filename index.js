@@ -40,3 +40,26 @@ app.post('/edit-image', upload.single('image'), async (req, res) => {
     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
     ctx.fillStyle = gradient;
+    ctx.fillRect(0, height - gradientHeight, width, gradientHeight);
+
+    // Add text
+    ctx.fillStyle = 'black';
+    ctx.font = 'bold 32px Arial';
+    ctx.fillText(text, 50, height - 80);
+
+    // Convert to buffer
+    const buffer = canvas.toBuffer('image/jpeg');
+
+    // Send image
+    res.set('Content-Type', 'image/jpeg');
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
